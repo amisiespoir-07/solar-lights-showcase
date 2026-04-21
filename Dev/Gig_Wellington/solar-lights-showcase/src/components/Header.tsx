@@ -2,6 +2,7 @@
 
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,10 +19,10 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:block">
             <ul className="flex space-x-8">
-              <li><a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Home</a></li>
-              <li><a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Street Lights</a></li>
-              <li><a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Accessories</a></li>
-              <li><a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">+ Info</a></li>
+              <li><Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Home</Link></li>
+              <li><Link href="/street-lights" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Street Lights</Link></li>
+              <li><Link href="/accessories" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Accessories</Link></li>
+              <li><Link href="/info" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">+ Info</Link></li>
             </ul>
           </nav>
 
@@ -40,10 +41,10 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Home</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Street Lights</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Accessories</a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">+ Info</a>
+              <Link href="/" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Home</Link>
+              <Link href="/street-lights" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Street Lights</Link>
+              <Link href="/accessories" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Accessories</Link>
+              <Link href="/info" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">+ Info</Link>
             </div>
           </div>
         )}

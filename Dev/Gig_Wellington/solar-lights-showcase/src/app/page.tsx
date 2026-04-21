@@ -1,15 +1,13 @@
 import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import BannerSection from '@/components/BannerSection';
-import ProductGrid from '@/components/ProductGrid';
+import SimpleHero from '@/components/SimpleHero';
+import ProductShowcase from '@/components/ProductShowcase';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      <HeroSection />
-      <BannerSection />
-      <ProductGrid />
+      <SimpleHero />
+      <ProductShowcase />
     </div>
   );
 }
