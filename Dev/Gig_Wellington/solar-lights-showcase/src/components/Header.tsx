@@ -3,9 +3,13 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <header className="bg-white shadow-sm">
@@ -18,11 +22,55 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:block">
-            <ul className="flex space-x-8">
-              <li><Link href="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Home</Link></li>
-              <li><Link href="/street-lights" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Street Lights</Link></li>
-              <li><Link href="/accessories" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Accessories</Link></li>
-              <li><Link href="/info" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">+ Info</Link></li>
+            <ul className="flex space-x-2">
+              <li>
+                <Link 
+                  href="/" 
+                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive('/') 
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/street-lights" 
+                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive('/street-lights') 
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  Street Lights
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/accessories" 
+                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive('/accessories') 
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  Accessories
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/info" 
+                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                    isActive('/info') 
+                      ? 'bg-green-600 text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  + Info
+                </Link>
+              </li>
             </ul>
           </nav>
 
@@ -39,12 +87,48 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Home</Link>
-              <Link href="/street-lights" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Street Lights</Link>
-              <Link href="/accessories" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">Accessories</Link>
-              <Link href="/info" className="text-gray-700 hover:text-gray-900 block px-3 py-2 text-base font-medium">+ Info</Link>
+          <div className="md:hidden pb-4">
+            <div className="space-y-2">
+              <Link 
+                href="/" 
+                className={`block px-4 py-2 text-base font-medium rounded-full transition-all ${
+                  isActive('/') 
+                    ? 'bg-green-600 text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                Home
+              </Link>
+              <Link 
+                href="/street-lights" 
+                className={`block px-4 py-2 text-base font-medium rounded-full transition-all ${
+                  isActive('/street-lights') 
+                    ? 'bg-green-600 text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                Street Lights
+              </Link>
+              <Link 
+                href="/accessories" 
+                className={`block px-4 py-2 text-base font-medium rounded-full transition-all ${
+                  isActive('/accessories') 
+                    ? 'bg-green-600 text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                Accessories
+              </Link>
+              <Link 
+                href="/info" 
+                className={`block px-4 py-2 text-base font-medium rounded-full transition-all ${
+                  isActive('/info') 
+                    ? 'bg-green-600 text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                + Info
+              </Link>
             </div>
           </div>
         )}
