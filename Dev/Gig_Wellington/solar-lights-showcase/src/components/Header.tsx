@@ -49,18 +49,6 @@ export default function Header() {
               </li>
               <li>
                 <Link 
-                  href="/accessories" 
-                  className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
-                    isActive('/accessories') 
-                      ? 'bg-green-600 text-white' 
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
-                >
-                  Accessories
-                </Link>
-              </li>
-              <li>
-                <Link 
                   href="/info" 
                   className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
                     isActive('/info') 
@@ -108,16 +96,6 @@ export default function Header() {
                 }`}
               >
                 Street Lights
-              </Link>
-              <Link 
-                href="/accessories" 
-                className={`block px-4 py-2 text-base font-medium rounded-full transition-all ${
-                  isActive('/accessories') 
-                    ? 'bg-green-600 text-white' 
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                }`}
-              >
-                Accessories
               </Link>
               <Link 
                 href="/info" 

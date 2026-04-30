@@ -2,14 +2,11 @@
 
 import { X, Star, Check, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
+import { type Product } from '@/lib/supabase';
+import Image from 'next/image';
 
 interface ProductModalProps {
-  product: {
-    id: number;
-    name: string;
-    price: string;
-    image: string;
-  } | null;
+  product: Product | null;
   onClose: () => void;
 }
 
@@ -44,7 +41,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
   };
 
   const handleWhatsAppContact = () => {
-    let message = `Hello, I am interested in the product: ${product.name}.\nPrice: ${product.price}.\nQuantity: ${quantity}.`;
+    let message = `Hello, I am interested in the product: ${product.name}.\nQuantity: ${quantity}.`;
     if (selectedOptions.length > 0) {
       message += `\nSelected options: ${selectedOptions.join(', ')}.`;
     }
@@ -70,24 +67,14 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
           {/* Product Images */}
           <div>
-            <div className="aspect-square mb-4">
-              <img
-                src={product.image}
+            <div className="relative aspect-square mb-4">
+              <Image
+                src={product.image_url}
                 alt={product.name}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover rounded-lg"
               />
-            </div>
-            {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square">
-                  <img
-                    src={`https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=100&h=100&fit=crop`}
-                    alt={`Thumbnail ${i}`}
-                    className="w-full h-full object-cover rounded cursor-pointer hover:opacity-80"
-                  />
-                </div>
-              ))}
             </div>
           </div>
 
@@ -107,16 +94,13 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           </div>
 
           {/* Price */}
-          <div className="text-3xl font-bold text-green-600">{product.price}</div>
-
-          {/* Slogan */}
-          <div className="text-lg text-gray-700 italic">
-            "Light Up Your Space with Solar Lumina Streetlights!"
-          </div>
+          {product.show_price && (
+            <div className="text-3xl font-bold text-green-600">Contact for Price</div>
+          )}
 
           {/* Description */}
           <p className="text-gray-600">
-            No wiring. No electricity bills. Just pure, powerful lighting—brilliant illumination powered by the sun.
+            {product.description}
           </p>
 
           {/* Features */}

@@ -8,6 +8,7 @@ import Image from 'next/image';
 export default function ProductShowcase() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [products, setProducts] = useState<Product[]>([]);
+  const [pageContent, setPageContent] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -27,14 +28,22 @@ export default function ProductShowcase() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('id', { ascending: true })
-        .limit(30);
+      const [productsRes, contentRes] = await Promise.all([
+        supabase.from('products').select('*').order('id', { ascending: true }).limit(30),
+        supabase.from('page_content').select('*').eq('page_name', 'home')
+      ]);
 
-      if (error) throw error;
-      setProducts(data || []);
+      if (productsRes.error) throw productsRes.error;
+      setProducts(productsRes.data || []);
+
+      // Convert page content to object
+      if (contentRes.data) {
+        const contentObj: { [key: string]: string } = {};
+        contentRes.data.forEach(item => {
+          contentObj[`${item.section_name}_${item.content_key}`] = item.content_value;
+        });
+        setPageContent(contentObj);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
       setProducts([]);
@@ -107,10 +116,10 @@ export default function ProductShowcase() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Products
+              {pageContent.products_title || 'Featured Products'}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore our range of high-quality solar lighting solutions and accessories
+              {pageContent.products_description || 'Explore our range of high-quality solar lighting solutions and accessories'}
             </p>
           </div>
 
@@ -135,7 +144,7 @@ export default function ProductShowcase() {
 
           {/* Product Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
+            {filteredProducts.map((product, index) => (
               <div
                 key={product.id}
                 onClick={() => openModal(product)}
@@ -148,6 +157,7 @@ export default function ProductShowcase() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={index < 3}
                   />
                 </div>
                 <div className="p-6">
