@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase, type Product } from '@/lib/supabase';
-import { Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon } from 'lucide-react';
+import { supabase, type Product, isSupabaseConfigured } from '@/lib/supabase';
+import { Plus, Edit, Trash2, Save, X, Upload, Image as ImageIcon, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 
 export default function ProductManager() {
@@ -27,6 +27,33 @@ export default function ProductManager() {
 
   const fetchProducts = async () => {
     try {
+      if (!isSupabaseConfigured) {
+        // Mock data for testing when Supabase is not configured
+        const mockProducts: Product[] = [
+          {
+            id: 1,
+            name: 'Solar Street Light Pro',
+            description: 'High-powered LED street light with advanced solar panel',
+            category: 'Street Lights',
+            image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+            show_price: true,
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: 'Solar Panel 200W',
+            description: 'High-efficiency monocrystalline solar panel',
+            category: 'Accessories',
+            image_url: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&h=300&fit=crop',
+            show_price: true,
+            created_at: new Date().toISOString()
+          }
+        ];
+        setProducts(mockProducts);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -85,22 +112,43 @@ export default function ProductManager() {
       let imageUrl = formData.image_url;
 
       if (imageFile) {
-        const uploadedUrl = await uploadImage(imageFile);
-        if (!uploadedUrl) return;
-        imageUrl = uploadedUrl;
+        if (!isSupabaseConfigured) {
+          // For mock data, just use a placeholder URL
+          imageUrl = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop';
+        } else {
+          const uploadedUrl = await uploadImage(imageFile);
+          if (!uploadedUrl) return;
+          imageUrl = uploadedUrl;
+        }
       }
 
-      const { error } = await supabase
-        .from('products')
-        .insert([{ ...formData, image_url: imageUrl }]);
+      if (!isSupabaseConfigured) {
+        // Handle mock data addition
+        const newProduct: Product = {
+          id: Math.max(...products.map(p => p.id), 0) + 1,
+          name: formData.name,
+          description: formData.description,
+          category: formData.category,
+          image_url: imageUrl || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+          show_price: formData.show_price,
+          created_at: new Date().toISOString()
+        };
+        setProducts(prev => [...prev, newProduct]);
+        alert('Product added successfully! (Note: Using mock data - configure Supabase for persistent storage)');
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .insert([{ ...formData, image_url: imageUrl }]);
 
-      if (error) throw error;
+        if (error) throw error;
+        alert('Product added successfully!');
+      }
       
       setShowAddForm(false);
       setFormData({ name: '', description: '', category: 'Street Lights', image_url: '', show_price: false });
       setImageFile(null);
       setImagePreview('');
-      fetchProducts();
+      if (isSupabaseConfigured) fetchProducts();
     } catch (error) {
       console.error('Error adding product:', error);
     }
@@ -110,6 +158,16 @@ export default function ProductManager() {
     try {
       const product = products.find(p => p.id === id);
       if (!product) return;
+
+      if (!isSupabaseConfigured) {
+        // Handle mock data update
+        setProducts(prev => prev.map(p => 
+          p.id === id ? { ...p, ...product } : p
+        ));
+        setEditingId(null);
+        alert('Product updated successfully! (Note: Using mock data - configure Supabase for persistent storage)');
+        return;
+      }
 
       const { error } = await supabase
         .from('products')
@@ -125,6 +183,7 @@ export default function ProductManager() {
       
       setEditingId(null);
       fetchProducts();
+      alert('Product updated successfully!');
     } catch (error) {
       console.error('Error updating product:', error);
     }
@@ -134,10 +193,24 @@ export default function ProductManager() {
     if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
 
     try {
-      const { error } = await supabase
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured) {
+        // Handle mock data deletion
+        console.log('Deleting mock product with ID:', id);
+        setProducts(prev => prev.filter(p => p.id !== id));
+        alert('Product deleted successfully! (Note: Using mock data - configure Supabase for persistent storage)');
+        return;
+      }
+
+      console.log('Attempting to delete product with ID:', id);
+      
+      const { data, error } = await supabase
         .from('products')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
+
+      console.log('Delete response:', { data, error });
 
       if (error) {
         console.error('Delete error:', error);
@@ -145,8 +218,13 @@ export default function ProductManager() {
         return;
       }
       
-      alert('Product deleted successfully!');
-      fetchProducts();
+      if (data && data.length > 0) {
+        alert('Product deleted successfully!');
+        fetchProducts();
+      } else {
+        alert('Product not found or already deleted.');
+        fetchProducts();
+      }
     } catch (error: any) {
       console.error('Error deleting product:', error);
       alert(`Error: ${error.message || 'Failed to delete product'}`);
@@ -164,7 +242,23 @@ export default function ProductManager() {
   }
 
   return (
-    <div>
+    <>
+      {/* Configuration Warning */}
+      {!isSupabaseConfigured && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="text-yellow-600" size={20} />
+            <div>
+              <h3 className="font-semibold text-yellow-800">Database Not Configured</h3>
+              <p className="text-yellow-700 text-sm">
+                Supabase environment variables are not set. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-black-900">Manage Products</h2>
         <button
@@ -360,7 +454,8 @@ export default function ProductManager() {
             </div>
           </div>
         ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
